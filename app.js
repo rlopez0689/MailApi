@@ -3,19 +3,21 @@ let bodyParser = require("body-parser");
 let request = require("request");
 var cors = require("cors");
 let AWS = require("aws-sdk");
-AWS.config.update({ region: "us-east-1" });
+AWS.config.update({
+  region: "us-east-1",
+  accessKeyId: process.env.MAIL_KEY,
+  secretAccessKey: process.env.MAIL_SECRET
+});
 let app = express();
 
 function sendMail(msg) {
   // Create the promise and SES service object
   return new AWS.SES({ apiVersion: "2010-12-01" })
-    .sendTemplatedEmail(params)
+    .sendTemplatedEmail(msg)
     .promise()
     .then(() => console.log("Mail sent successfully"))
     .catch(error => console.error(error.toString()));
 }
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,11 +57,10 @@ app.post("/submit", cors(), function(req, res) {
     var msg = {
       Source: process.env.MAIL_ACCOUNT,
       Template: process.env.TEMPLATE_ID,
-      ConfigurationSetName: "ConfigSet",
       Destination: {
         ToAddresses: [process.env.MAIL_ACCOUNT]
       },
-      TemplateData: req.body
+      TemplateData: JSON.stringify(req.body)
     };
     await sendMail(msg);
     res.json({ responseCode: 0, responseDesc: "Sucess" });
