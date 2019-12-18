@@ -2,12 +2,15 @@ let express = require("express");
 let bodyParser = require("body-parser");
 let request = require("request");
 var cors = require("cors");
-const sgMail = require("@sendgrid/mail");
+let AWS = require("aws-sdk");
+AWS.config.update({ region: "us-east-1" });
 let app = express();
 
 function sendMail(msg) {
-  return sgMail
-    .send(msg)
+  // Create the promise and SES service object
+  return new AWS.SES({ apiVersion: "2010-12-01" })
+    .sendTemplatedEmail(params)
+    .promise()
     .then(() => console.log("Mail sent successfully"))
     .catch(error => console.error(error.toString()));
 }
@@ -49,11 +52,14 @@ app.post("/submit", cors(), function(req, res) {
       });
     }
     delete req.body["g-recaptcha-response"];
-    const msg = {
-      to: process.env.MAIL_ACCOUNT,
-      from: process.env.MAIL_ACCOUNT,
-      templateId: process.env.TEMPLATE_ID,
-      dynamic_template_data: req.body
+    var msg = {
+      Source: process.env.MAIL_ACCOUNT,
+      Template: process.env.TEMPLATE_ID,
+      ConfigurationSetName: "ConfigSet",
+      Destination: {
+        ToAddresses: [process.env.MAIL_ACCOUNT]
+      },
+      TemplateData: req.body
     };
     await sendMail(msg);
     res.json({ responseCode: 0, responseDesc: "Sucess" });
