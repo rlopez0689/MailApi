@@ -21,5 +21,5 @@ _Node -> Defined in package.json_
 _This proyect has a now.json for making a deploy into zeit.com_
 
 ```
-now -e MAIL_KEY=<AWS_KEY> -e MAIL_SECRET=<AWS_SECRET> -e CAPTCHA_SECRET_KEY=<CAPTCHA_SECRET_KEY> -e TEMPLATE_ID=<TEMPLATE_NAME_SES> -e MAIL_ACCOUNT=<MAIL_ACCOUNT> --prod
+now -e MAIL_KEY=<AWS_KEY> -e MAIL_SECRET=<AWS_SECRET> -e CAPTCHA_SECRET_KEY=<CAPTCHA_SECRET_KEY> -e MAIL_ACCOUNT=<MAIL_ACCOUNT> --prod
 ```

@@ -31,6 +31,7 @@ app.post("/submit", cors(), function(req, res) {
     req.body["g-recaptcha-response"] === "" ||
     req.body["g-recaptcha-response"] === null
   ) {
+    console.log("Captcha not found");
     return res.json({ responseCode: 1, responseDesc: "Please select captcha" });
   }
 
@@ -48,15 +49,24 @@ app.post("/submit", cors(), function(req, res) {
     body = JSON.parse(body);
     // Success will be true or false depending upon captcha validation.
     if (body.success !== undefined && !body.success) {
+      console.log("Captcha verification failed");
       return res.json({
         responseCode: 1,
         responseDesc: "Failed captcha verification"
       });
     }
     delete req.body["g-recaptcha-response"];
+    let templateName = req.body["template-name"];
+    if (!templateName) {
+      console.log("template not found");
+      return res.json({
+        responseDesc: "template not found"
+      });
+    }
+    delete req.body["template-name"];
     var msg = {
       Source: process.env.MAIL_ACCOUNT,
-      Template: process.env.TEMPLATE_ID,
+      Template: templateName,
       Destination: {
         ToAddresses: [process.env.MAIL_ACCOUNT]
       },
